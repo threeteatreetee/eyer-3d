@@ -33,7 +33,15 @@
   #view{flex:1;position:relative}
   #cv{display:block;width:100%;height:100%}
   #status{position:absolute;left:calc(10px + env(safe-area-inset-left));bottom:calc(10px + env(safe-area-inset-bottom));font-size:12px;background:rgba(15,22,32,.85);padding:6px 11px;border-radius:7px;color:var(--good);max-width:calc(100% - 150px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #tools{position:absolute;top:calc(10px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:60%}
+  /* ปุ่มเครื่องมือ = ป็อปอัปแนวตั้ง เปิดจากปุ่มลอย ⚙ */
+  #toolsFab,#sideToggle{z-index:30;font-size:16px;padding:7px 11px;background:rgba(23,34,48,.92);border:1px solid var(--line)}
+  #toolsFab{position:absolute;top:calc(10px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right))}
+  #sideToggle{position:fixed;top:calc(10px + env(safe-area-inset-top));left:calc(10px + env(safe-area-inset-left))}
+  #tools{position:absolute;top:calc(54px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));display:none;flex-direction:column;align-items:stretch;gap:5px;z-index:25;width:165px}
+  #tools button{text-align:left;white-space:nowrap}
+  body.tools-open #tools{display:flex}
+  body.side-hidden #side{display:none}
+  h1{margin-left:38px}
   #viewcube{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));right:calc(10px + env(safe-area-inset-right));display:grid;grid-template-columns:repeat(3,34px);grid-auto-rows:24px;gap:3px;background:rgba(23,34,48,.85);padding:6px;border-radius:8px;border:1px solid var(--line)}
   #viewcube button{padding:2px;font-size:10px;font-weight:600}
   #viewcube .sp{visibility:hidden}
@@ -51,6 +59,8 @@
   </aside>
   <main id="view">
     <canvas id="cv"></canvas>
+    <button id="sideToggle" title="เมนูซ้าย">☰</button>
+    <button id="toolsFab" title="เครื่องมือ">⚙</button>
     <div id="tools"><button id="catCon" class="on">🧱 คอนกรีต: โปร่ง</button><button id="catReb" class="on">🔩 เหล็กหลัก</button><button id="catTie" style="opacity:.4">🔲 ปลอก</button><button id="btnGrid" class="on">▦ กริด/พื้น</button><button id="btnRuler" class="on">📏 มาตรวัด</button><button id="btnLabel" class="on">🏷 รหัส</button><button id="fitBtn">⤢ พอดีจอ</button><button id="btnFs">⛶ เต็มจอ</button><button id="allOn">👁 เปิดหมด</button><button id="allOff">🚫 ปิดหมด</button></div>
     <div id="viewcube">
       <button class="sp"></button><button data-v="top">TOP</button><button data-v="iso">ISO</button>
@@ -1454,6 +1464,10 @@ $('btnFs').onclick=()=>{const el=document.documentElement,fs=document.fullscreen
   else if(el.webkitRequestFullscreen){el.webkitRequestFullscreen();}
   else{setStatus('iPhone: กดแชร์ → "เพิ่มลงในหน้าจอโฮม" แล้วเปิดจากไอคอน = เต็มจอ',true);}};
 document.addEventListener('fullscreenchange',()=>{if(typeof resize==='function')resize();});
+// ---- มือถือ: แถบซ้ายสไลด์เก็บ (☰) + ปุ่มเครื่องมือลอยกางเมนู (⚙) ----
+$('sideToggle').onclick=()=>{document.body.classList.toggle('side-hidden');setTimeout(()=>{if(typeof resize==='function')resize();},60);};
+$('toolsFab').onclick=()=>document.body.classList.toggle('tools-open');
+if(innerWidth<760)document.body.classList.add('side-hidden');else document.body.classList.add('tools-open');   // จอเล็ก: ซ่อนแถบซ้าย+เก็บเครื่องมือ · จอใหญ่: กางเครื่องมือ
 // ---- ViewCube: มุมกล้องมาตรฐาน (top/front/side/iso) ----
 const VDIR={top:[0,1,0],bottom:[0,-1,0],front:[0,0,1],back:[0,0,-1],left:[-1,0,0],right:[1,0,0],iso:[1,0.8,1]};
 function setView(name){if(!controls)return;const bb=modelBox();if(!bb)return;
